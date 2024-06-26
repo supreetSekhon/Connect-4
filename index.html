@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Connect 4 Game</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body>
+    <div class="flex justify-center items-center h-screen flex-col">
+      <h1>Connect 4</h1>
+      <div
+        class="grid grid-cols-7 gap-2 border-2 p-1"
+        id="grid_columns_div"
+      ></div>
+      <div class="flex justify-center gap-2 m-2">
+        <button class="rounded bg-black text-white p-2" onClick="startNewGame()">Reset Game</button>
+        <button class="rounded bg-black text-white p-2" onClick="startNewGame()">Start new Game</button>
+      </div>
+      <div class="flex justofy-center">
+        <p id="wining_team"></p>
+      </div>
+    </div>
+    <script>
+      //---function to generate initial blocks ----
+      function generateBlock() {
+        //-----need 6 rows and 7 cols ----
+        //----it would be 2 loops ----
+        var content = "";
+        for (let i = 1; i <= 6; i++) {
+          for (let j = 1; j <= 7; j++) {
+            content +=
+              '<button class="rounded-full bg-gray-300 p-2 min-h-9 min-w-9 btn_play" id="btn_' +
+              i +
+              "_" +
+              j +
+              '"></button>';
+          }
+        }
+        document.getElementById("grid_columns_div").innerHTML = content;
+      }
+      generateBlock();
+      //-------two player game we need to keep track of which player is the current player
+      //----by default keep red as current player
+      let current_player = 1; //----will switch between red and yellow
+      let red_won = 0;
+      let yellow_won = 0;
+      let move_count = 0; //-----we will maintain this to check for possible draw
+      document.querySelectorAll(".btn_play").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const btn_id = btn.getAttribute("id");
+          playgame(btn_id);
+        });
+      });
+      //----this function will check for current player and place the red or yellow button -----
+      function playgame(btn_id) {
+        //----button id has been passed ----
+        console.log(btn_id);
+        const parts = btn_id.split("_"); // Split the id string by underscore
+        const lastPart = parts[parts.length - 1]; // Get the last part of the array
+        //-----before adding any more color or columns check if someone has already won the game -----
+        checkWinner();
+        if (red_won != 1 && yellow_won != 1) {
+            //----we need to iterate through the column to get which one is free ---
+          for (let i = 6; i >= 1; i--) {
+            const button_check = document.getElementById(
+              `btn_${i}_${lastPart}`
+            );
+            if (!button_check.classList.contains("filled")) {
+              //----add the class filled ---
+              button_check.classList.add("filled");
+              button_check.classList.remove("bg-gray-300");
+              if (current_player == 1) {
+                current_player = 2;
+                button_check.classList.add("bg-red-700");
+                button_check.classList.add("red-team");
+              } else {
+                current_player = 1;
+                button_check.classList.add("bg-amber-300");
+                button_check.classList.add("yellow-team");
+              }
+              move_count++;
+              break;
+            }
+          }
+        } //------no one has won yet
+        else if(red_won == 1){
+            document.getElementById('wining_team').innerHTML = 'Red Player Won 🎉';
+        }else if(yellow_won == 1){
+            document.getElementById('wining_team').innerHTML = 'Yellow Player Won 🎉';
+        }else if (move_count == 42) {
+            document.getElementById('wining_team').innerHTML = 'It\'s a Draw!';
+        }
+      }
+      //-----this function will check for winner-----
+
+      function checkWinner() {
+        const directions = [
+          { x: 0, y: 1 }, // Vertical
+          { x: 1, y: 0 }, // Horizontal
+          { x: 1, y: 1 }, // Diagonal down-right
+          { x: 1, y: -1 }, // Diagonal up-right
+        ];
+
+        function checkDirection(x, y, direction, team) {
+          let count = 0;
+          for (let i = 0; i < 4; i++) {
+            const btn = document.getElementById(
+              `btn_${x + i * direction.x}_${y + i * direction.y}`
+            );
+            if (btn && btn.classList.contains(`${team}-team`)) {
+              count++;
+            } else {
+              break;
+            }
+          }
+          return count === 4;
+        }
+
+        for (let x = 1; x <= 6; x++) {
+          for (let y = 1; y <= 7; y++) {
+            for (const direction of directions) {
+              if (checkDirection(x, y, direction, "red")) {
+                red_won = 1;
+                return;
+              }
+              if (checkDirection(x, y, direction, "yellow")) {
+                yellow_won = 1;
+                return;
+              }
+            }
+          }
+        }
+      }
+      function startNewGame(){
+        current_player = 1; //----will switch between red and yellow
+        red_won = 0;
+        yellow_won = 0;
+        move_count = 0;
+        document.getElementById('wining_team').innerHTML = '';
+        generateBlock();
+        // Reattach event listeners to the new buttons
+        document.querySelectorAll(".btn_play").forEach((btn) => {
+            btn.addEventListener("click", () => {
+            const btn_id = btn.getAttribute("id");
+            playgame(btn_id);
+            });
+        });
+      }
+    </script>
+  </body>
+</html>
