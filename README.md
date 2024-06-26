@@ -35,11 +35,11 @@ To run this game locally on your machine, follow these steps:
 
 1. **Clone the repository:**
     ```bash
-    git clone https://github.com/your-username/connect-4-game.git
+    git clone https://github.com/supreetSekhon/Connect-4.git
     ```
 2. **Navigate to the project directory:**
     ```bash
-    cd connect-4-game
+    cd Connect-4
     ```
 3. **Open the `index.html` file in your web browser:**
     ```bash
